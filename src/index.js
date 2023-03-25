@@ -71,14 +71,14 @@ function showInformationAboutCountry(countries) {
     .querySelector('.country-item img')
     .classList.add('country-item__img');
   const markup2 = countries
-    .map(({ capital, population, flags, languages }) => {
+    .map(({ capital, population, languages }) => {
       const countryLanguages = Object.values(languages);
-      return `<div class="container-details"><p><span class="bold">Capital:</span> ${capital}</p>
+      return `<card class="container-details"><p><span class="bold">Capital:</span> ${capital}</p>
             <p><span class="bold">Population:</span> ${population}</p>
             <p><span class="bold">Languages:</span> ${countryLanguages.map(
               lang => `${lang}`
             )}</p>
-            </div>
+            </card>
             `;
     })
     .join('');
