@@ -1,5 +1,5 @@
 import './css/styles.css';
-import fetchCountries from './js/fetchCountries';
+import { fetchCountries } from './js/fetchCountries';
 import Debounce from 'lodash.debounce';
 import { Notify } from 'notiflix';
 
@@ -14,28 +14,27 @@ countryInput.addEventListener(
   Debounce(() => addingCountriesToHTML(), DEBOUNCE_DELAY)
 );
 
-function addingCountriesToHTML() {
+async function addingCountriesToHTML() {
   const name = countryInput.value.trim();
   if (name) {
-    fetchCountries(name)
-      .then(countries => {
-        const countriesQty = countries.length;
-        const min = 2;
-        const max = 10;
-        if (countriesQty > max) {
-          tooManyNotification();
-          return;
-        } else if (countriesQty > min && countriesQty < max) {
-          showCountryList(countries);
-          countryInfo.innerHTML = '';
-          return;
-        }
-        showInformationAboutCountry(countries);
-      })
-      .catch(error => {
-        notFoundNotification();
-        console.log(`Error ${error}`);
-      });
+    const fetchResult = await fetchCountries(name);
+    try {
+      const countriesQty = fetchResult.length;
+      const min = 2;
+      const max = 10;
+      if (countriesQty > max) {
+        tooManyNotification();
+        return;
+      } else if (countriesQty > min && countriesQty < max) {
+        showCountryList(fetchResult);
+        countryInfo.innerHTML = '';
+        return;
+      }
+      showInformationAboutCountry(fetchResult);
+    } catch (error) {
+      notFoundNotification(error);
+      console.log(`Error ${error}`);
+    }
   }
 }
 
@@ -44,9 +43,11 @@ function tooManyNotification() {
   Notify.info('Too many matches found. Please enter a more specific name.');
 }
 
-function notFoundNotification() {
+function notFoundNotification(error) {
   clearHTML();
+  if(error){
   Notify.failure('Oops, there is no country with that name');
+  }
 }
 
 function clearHTML() {
